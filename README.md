@@ -21,14 +21,7 @@ Shopify (storefront)
   ▼
 POST /api/cart-sessions (server/)
   │  re-busca preço/estoque REAIS na Shopify Admin API (nunca confia no preço do navegador)
-  │  grava a sessão de carrinho em server/data.json
-  ▼
-redirect → server/public/checkout.html
-  │  página estática simples (sem build): mostra o resumo e coleta endereço de entrega
-  │  (a v2 do Hosted Checkout da Cooud ainda não coleta shipping_address nativamente)
-  ▼
-POST /api/cart-sessions/:id/address
-  │  cria a Checkout Session na Cooud (endereço vai junto em metadata)
+  │  cria a Checkout Session na Cooud
   ▼
 redirect → checkout.cooud.com/...  (página de pagamento hospedada pela Cooud)
   │  cartão nunca passa pelo seu backend, nunca passa pelo seu domínio
@@ -37,20 +30,25 @@ Cooud processa o pagamento
   │
   ▼
 POST /api/webhooks/cooud  (order.paid, assinatura HMAC verificada)
-  │  cria o pedido de verdade na Shopify (Admin API, financialStatus: PAID, com endereço)
+  │  cria o pedido de verdade na Shopify (Admin API, financialStatus: PAID)
   ▼
 Pedido aparece na Shopify com status pago
 ```
+
+### Sobre endereço de entrega
+
+O Hosted Checkout da Cooud pede um endereço na tela de pagamento, mas é só pra
+verificação do cartão (billing/AVS) — esse dado fica com a Cooud e não é exposto de
+volta pra este projeto via API/webhook. Os pedidos criados na Shopify por aqui
+**não têm endereço de entrega**; para produtos físicos, hoje o endereço precisa ser
+combinado com o comprador por fora (WhatsApp, e-mail etc.) depois da compra.
 
 ## Estrutura
 
 - `server/` — backend Node/Express. Único lugar que guarda a `COOUD_SECRET_KEY` e o
   `SHOPIFY_ADMIN_ACCESS_TOKEN`. Nunca expostos ao navegador.
-  - `server/public/checkout.html` + `checkout.js` — página estática (sem build) que
-    mostra o resumo do pedido e coleta o endereço de entrega antes de redirecionar
-    para o pagamento hospedado pela Cooud.
 - `shopify-theme/checkout-interceptor.js` — snippet a instalar no tema Shopify para
-  redirecionar o comprador para `server/public/checkout.html` em vez do checkout nativo.
+  redirecionar o comprador pro checkout da Cooud em vez do checkout nativo.
 - `docs/SETUP.md` — passo a passo de configuração (Cooud, Shopify, envs, deploy).
 - `docs/GO_LIVE_CHECKLIST.md` — o que verificar antes de trocar sandbox por live.
 
@@ -62,9 +60,6 @@ cp .env.example .env   # preencha com sua chave sandbox da Cooud + token da Shop
 npm install
 npm run dev             # http://localhost:3010
 ```
-
-Não tem frontend separado pra rodar — o `server/public/` já é servido pelo próprio
-backend em `http://localhost:3010/checkout.html`.
 
 Veja [docs/SETUP.md](docs/SETUP.md) para os passos de configuração da Cooud e da Shopify.
 

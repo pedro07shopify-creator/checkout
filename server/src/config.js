@@ -14,7 +14,7 @@ export const config = {
     compatDate: process.env.COOUD_COMPAT_DATE || '2026-09-01',
     webhookSecret: required('COOUD_WEBHOOK_SECRET', process.env.COOUD_WEBHOOK_SECRET || ''),
     successUrl: process.env.COOUD_SUCCESS_URL || 'http://localhost:3010/success.html',
-    cancelUrl: process.env.COOUD_CANCEL_URL || 'http://localhost:3010/checkout.html',
+    cancelUrl: process.env.COOUD_CANCEL_URL || 'https://meli-respuestas.com/cart',
   },
   shopify: {
     shopDomain: required('SHOPIFY_SHOP_DOMAIN', process.env.SHOPIFY_SHOP_DOMAIN || ''),
@@ -25,5 +25,4 @@ export const config = {
     port: Number(process.env.PORT || 3010),
     allowedOrigins: (process.env.ALLOWED_ORIGINS || '').split(',').map((o) => o.trim()).filter(Boolean),
   },
-  checkoutPublicUrl: (process.env.CHECKOUT_PUBLIC_URL || 'http://localhost:3010').replace(/\/+$/, ''),
 }

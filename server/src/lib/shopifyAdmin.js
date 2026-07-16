@@ -58,7 +58,7 @@ export async function getAuthoritativeVariants(variantIds) {
  * Called from the Cooud order.paid webhook. Creates the real Shopify order so
  * inventory, reporting and fulfillment behave exactly like a native checkout order.
  */
-export async function createPaidShopifyOrder({ lineItems, email, cooudOrderId, currency, totalAmount, shippingAddress }) {
+export async function createPaidShopifyOrder({ lineItems, email, cooudOrderId, currency, totalAmount }) {
   const data = await shopifyGraphql(
     `mutation OrderCreate($order: OrderCreateOrderInput!) {
       orderCreate(order: $order) {
@@ -82,19 +82,9 @@ export async function createPaidShopifyOrder({ lineItems, email, cooudOrderId, c
             amountSet: { shopMoney: { amount: totalAmount, currencyCode: currency.toUpperCase() } },
           },
         ],
-        shippingAddress: shippingAddress
-          ? {
-              firstName: shippingAddress.firstName,
-              lastName: shippingAddress.lastName,
-              address1: shippingAddress.address1,
-              address2: shippingAddress.address2 || undefined,
-              city: shippingAddress.city,
-              provinceCode: shippingAddress.province,
-              zip: shippingAddress.zip,
-              phone: shippingAddress.phone,
-              countryCode: 'AR',
-            }
-          : undefined,
+        // No shipping address: Cooud's hosted checkout collects a billing address for card
+        // verification only, and it isn't exposed back to merchants via the API/webhook.
+        // Follow up with the buyer directly (WhatsApp, email) to get delivery details.
         note: `Pago via Cooud — cooud_order_id: ${cooudOrderId}`,
         tags: ['cooud-checkout'],
       },

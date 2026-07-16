@@ -31,27 +31,33 @@
 
 1. Suba `shopify-theme/checkout-interceptor.js` em **Online Store → Themes → Edit
    code → Assets → Add a new asset**.
-2. Em `layout/theme.liquid`, antes de `</body>`:
+2. Em `layout/theme.liquid`, antes de `</body>` (repare que temas com uma seção
+   `{% else %}` de "tema desativado" têm dois `</body>` — use o primeiro, da branch
+   real do tema):
    ```liquid
    <script src="{{ 'checkout-interceptor.js' | asset_url }}" defer
            data-checkout-api="https://SEU-BACKEND-DOMAIN"></script>
    ```
-3. Publique o tema numa loja de teste antes de ir para a loja principal — teste o
-   fluxo completo (produto → "Comprar agora" → checkout Cooud → pagamento sandbox →
-   pedido aparecendo na Shopify).
+3. **Desative os botões de checkout dinâmico** ("Comprar agora" / "Buy it now") nas
+   configurações de produto do tema (Personalizar → bloco de Comprar/Preço → "Mostrar
+   botões de checkout dinâmico"). Esse botão roda dentro de um iframe da própria
+   Shopify — nenhum script de tema consegue interceptar o clique nele. Deixe só
+   "Adicionar ao carrinho"; o botão "Finalizar compra" do carrinho não é iframe e
+   funciona normalmente com o snippet.
+4. Publique o tema numa loja de teste antes de ir para a loja principal — teste o
+   fluxo completo (produto → Adicionar ao carrinho → Finalizar compra → checkout Cooud
+   → pagamento sandbox → pedido aparecendo na Shopify).
 
 ## 4. Variáveis de ambiente
 
-Veja `server/.env.example`. Não existe frontend separado — `server/public/` (a página
-de endereço) é servido pelo próprio backend Express.
+Veja `server/.env.example`.
 
 ## 5. Deploy
 
 - `server/`: qualquer host Node (Railway, Render, Fly.io, VPS) com HTTPS. Exponha
-  publicamente `/api/webhooks/cooud` — a Cooud precisa alcançá-lo — e
-  `/checkout.html` — é pra onde a Shopify redireciona o comprador.
-- Atualize `CHECKOUT_PUBLIC_URL` para o domínio HTTPS real do backend em produção.
+  publicamente `/api/webhooks/cooud` — a Cooud precisa alcançá-lo.
 - Atualize `COOUD_SUCCESS_URL` e `COOUD_CANCEL_URL` — o ideal é apontarem para páginas
-  reais da sua loja Shopify (ex: uma página "Obrigado pela compra"), não para o backend.
+  reais da sua loja Shopify (ex: uma página "Obrigado pela compra" e o carrinho),
+  não para o backend.
 - Atualize `ALLOWED_ORIGINS` para o domínio real da sua loja Shopify (é de lá que o
   snippet do tema chama `POST /api/cart-sessions`).

@@ -65,7 +65,6 @@ async function handleOrderPaid(event) {
     cooudOrderId: event.data?.id,
     currency: cartSession.currency,
     totalAmount: (cartSession.totalAmountCents / 100).toFixed(2),
-    shippingAddress: cartSession.shippingAddress,
   })
 
   markCartSessionStatus(cartSession.id, 'paid')
