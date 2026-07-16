@@ -68,7 +68,7 @@ export async function createPaidShopifyOrder({ lineItems, email, cooudOrderId, c
     }`,
     {
       order: {
-        currency,
+        currency: currency.toUpperCase(),
         email: email || undefined,
         lineItems: lineItems.map((item) => ({
           variantId: `gid://shopify/ProductVariant/${item.variantId}`,
