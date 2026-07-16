@@ -33,7 +33,7 @@ async function cooudRequest(pathname, body, idempotencyKey) {
  * payment UI ever touches this project, so there is no Elements/CSP surface to maintain.
  */
 export async function createCheckoutSession({ lineItems, customerEmail, successUrl, metadata, idempotencyKey }) {
-  return cooudRequest(
+  const session = await cooudRequest(
     '/checkout-sessions',
     {
       ui_mode: 'hosted',
@@ -45,4 +45,13 @@ export async function createCheckoutSession({ lineItems, customerEmail, successU
     },
     idempotencyKey,
   )
+
+  // Temporary workaround (confirmed by Cooud's own dev team, 2026-07-16): live-mode
+  // sessions can come back with the wrong checkout host (cooud.com, which 404s) instead
+  // of checkout.cooud.com. Remove once they fix it on their end.
+  if (session.url?.startsWith('https://cooud.com/checkout/')) {
+    session.url = session.url.replace('https://cooud.com/checkout/', 'https://checkout.cooud.com/checkout/')
+  }
+
+  return session
 }
