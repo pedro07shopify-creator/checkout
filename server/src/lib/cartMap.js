@@ -48,7 +48,9 @@ export async function buildLineItemsFromCart(requestedItems, { currency = 'ars' 
     })
 
     lineItems.push({
-      name: variant.title,
+      // Cooud rejects line_items[].name over 120 chars (confirmed empirically —
+      // undocumented limit). Shopify product titles routinely exceed that.
+      name: truncateName(variant.title, 120),
       amount: unitAmountCents,
       currency,
       quantity,
@@ -65,4 +67,9 @@ function toMinorUnits(decimalPriceString) {
   const [whole, fraction = ''] = String(decimalPriceString).split('.')
   const cents = (fraction + '00').slice(0, 2)
   return Number(whole) * 100 + Number(cents)
+}
+
+function truncateName(name, maxLength) {
+  if (name.length <= maxLength) return name
+  return `${name.slice(0, maxLength - 1)}…`
 }
