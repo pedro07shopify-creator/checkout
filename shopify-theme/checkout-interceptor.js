@@ -4,8 +4,9 @@
  * What it does: intercepts clicks on "Comprar agora" (product page buy-now) and
  * "Finalizar compra" (cart) buttons, reads the current cart from Shopify's own
  * /cart.js endpoint (public, read-only), sends variant IDs + quantities to our
- * backend to get a checkout link, and redirects the buyer there instead of to
- * Shopify's native checkout.
+ * backend, and redirects the buyer to the link it returns (our own short
+ * address-collection page, which itself redirects to the Cooud-hosted payment
+ * page after the buyer submits shipping details) instead of Shopify's native checkout.
  *
  * Only variant IDs and quantities leave the browser here — no prices are trusted
  * from the client; the backend re-fetches authoritative prices from the Shopify

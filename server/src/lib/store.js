@@ -54,6 +54,14 @@ export function attachCooudSession(id, cooudSessionId) {
   writeData(data)
 }
 
+export function attachShippingDetails(id, { email, shippingAddress }) {
+  const data = readData()
+  if (!data.cartSessions[id]) return
+  data.cartSessions[id].email = email || data.cartSessions[id].email
+  data.cartSessions[id].shippingAddress = shippingAddress
+  writeData(data)
+}
+
 export function markCartSessionStatus(id, status) {
   const data = readData()
   if (!data.cartSessions[id]) return

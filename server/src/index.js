@@ -1,10 +1,12 @@
 import express from 'express'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { config } from './config.js'
 import { corsMiddleware } from './middleware/cors.js'
 import { webhooksRouter } from './routes/webhooks.js'
 import { cartSessionsRouter } from './routes/cartSessions.js'
-import { checkoutSessionsRouter } from './routes/checkoutSessions.js'
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const app = express()
 app.use(corsMiddleware)
 
@@ -14,7 +16,8 @@ app.use(webhooksRouter)
 
 app.use(express.json())
 app.use(cartSessionsRouter)
-app.use(checkoutSessionsRouter)
+// The address-collection page (checkout.html/.js) — plain HTML, no build step.
+app.use(express.static(path.join(__dirname, '..', 'public')))
 
 app.get('/health', (_req, res) => res.json({ ok: true }))
 

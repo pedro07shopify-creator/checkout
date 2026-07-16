@@ -28,12 +28,15 @@ async function cooudRequest(pathname, body, idempotencyKey) {
  * lineItems: [{ name, amount (integer, smallest currency unit), currency, quantity }]
  * All prices are re-derived server-side from Shopify (see lib/shopifyAdmin.js) — never trust
  * amounts coming from the browser.
+ *
+ * ui_mode "hosted": the buyer pays on a Cooud-hosted page (response.url). No card data or
+ * payment UI ever touches this project, so there is no Elements/CSP surface to maintain.
  */
 export async function createCheckoutSession({ lineItems, customerEmail, successUrl, metadata, idempotencyKey }) {
   return cooudRequest(
     '/checkout-sessions',
     {
-      ui_mode: 'custom',
+      ui_mode: 'hosted',
       line_items: lineItems,
       customer_email: customerEmail || undefined,
       success_url: successUrl || config.cooud.successUrl,
@@ -42,12 +45,4 @@ export async function createCheckoutSession({ lineItems, customerEmail, successU
     },
     idempotencyKey,
   )
-}
-
-export async function getElementConfig(sessionId, theme = 'auto') {
-  const safeSessionId = String(sessionId || '').replace(/[^a-zA-Z0-9_-]/g, '')
-  if (!safeSessionId) throw new Error('Missing session_id')
-  return cooudRequest(`/checkout-sessions/${safeSessionId}/element-config`, {
-    appearance: { theme: ['auto', 'light', 'dark'].includes(theme) ? theme : 'auto' },
-  })
 }

@@ -39,15 +39,16 @@
 
 ## 4. Variáveis de ambiente
 
-Veja `server/.env.example` e `web/.env.example`. Nenhuma chave secreta (`cooud_sk_*`,
-`shpat_*`) deve existir em `web/`.
+Veja `server/.env.example`. Não existe frontend separado — `server/public/` (a página
+de endereço) é servido pelo próprio backend Express.
 
 ## 5. Deploy
 
-- `server/`: qualquer host Node (Railway, Render, Fly.io, VPS). Exponha
-  `/api/webhooks/cooud` publicamente com HTTPS — a Cooud precisa alcançá-lo.
-- `web/`: `npm run build` gera `dist/`; hospede em qualquer static host (Vercel,
-  Netlify, Cloudflare Pages). Configure fallback de SPA para `/pay/*`, `/success`,
-  `/cancel` apontarem para `index.html`.
-- Atualize `CHECKOUT_PUBLIC_URL`, `COOUD_SUCCESS_URL`, `COOUD_CANCEL_URL` e
-  `ALLOWED_ORIGINS` em `server/.env` para os domínios reais de produção.
+- `server/`: qualquer host Node (Railway, Render, Fly.io, VPS) com HTTPS. Exponha
+  publicamente `/api/webhooks/cooud` — a Cooud precisa alcançá-lo — e
+  `/checkout.html` — é pra onde a Shopify redireciona o comprador.
+- Atualize `CHECKOUT_PUBLIC_URL` para o domínio HTTPS real do backend em produção.
+- Atualize `COOUD_SUCCESS_URL` e `COOUD_CANCEL_URL` — o ideal é apontarem para páginas
+  reais da sua loja Shopify (ex: uma página "Obrigado pela compra"), não para o backend.
+- Atualize `ALLOWED_ORIGINS` para o domínio real da sua loja Shopify (é de lá que o
+  snippet do tema chama `POST /api/cart-sessions`).

@@ -49,7 +49,7 @@ webhooksRouter.post('/api/webhooks/cooud', express.raw({ type: 'application/json
 
 async function handleOrderPaid(event) {
   // The Order carries forward the metadata we set on the Checkout Session at creation
-  // time (see routes/checkoutSessions.js), which is how we map back to our own cart.
+  // time (see routes/cartSessions.js), which is how we map back to our own cart.
   const cartSessionId = event.data?.metadata?.internal_cart_session_id
   const cartSession = cartSessionId ? getCartSession(cartSessionId) : null
 
@@ -65,6 +65,7 @@ async function handleOrderPaid(event) {
     cooudOrderId: event.data?.id,
     currency: cartSession.currency,
     totalAmount: (cartSession.totalAmountCents / 100).toFixed(2),
+    shippingAddress: cartSession.shippingAddress,
   })
 
   markCartSessionStatus(cartSession.id, 'paid')
