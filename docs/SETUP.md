@@ -22,7 +22,10 @@
    - `write_orders` (criar o pedido depois do pagamento aprovado)
 3. Instale o app na loja e copie o **Admin API access token** (`shpat_...`).
    Cole em `server/.env` como `SHOPIFY_ADMIN_ACCESS_TOKEN`.
-4. `SHOPIFY_SHOP_DOMAIN=meli-respuestas.com`.
+4. `SHOPIFY_SHOP_DOMAIN` precisa ser o domínio **`.myshopify.com`**, não o domínio
+   customizado da loja — a Admin API não responde em `meli-respuestas.com`. Para achar
+   o domínio certo: Shopify Admin → Configurações → Domínios (aparece como "domínio
+   principal da Shopify"), ou rode `shop { myshopifyDomain }` via GraphQL Admin API.
 
 ## 3. Instalar o snippet no tema
 
