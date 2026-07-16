@@ -12,6 +12,13 @@
  * from the client; the backend re-fetches authoritative prices from the Shopify
  * Admin API before creating the Cooud Checkout Session.
  *
+ * Dynamic checkout buttons ("Comprar agora" / "Buy it now", Shop Pay, etc.) render
+ * inside a Shopify-controlled iframe — no page script can intercept clicks in there.
+ * This script hides that container via CSS (targeting the standard
+ * `data-shopify="payment-button"` hook Shopify's `payment_button` Liquid filter always
+ * outputs, regardless of theme markup) so buyers are only offered "Adicionar ao
+ * carrinho", whose flow this script CAN intercept.
+ *
  * Install: Shopify Admin -> Online Store -> Themes -> Edit code -> layout/theme.liquid,
  * add before </body>:
  *   <script src="{{ 'checkout-interceptor.js' | asset_url }}" defer
@@ -26,9 +33,12 @@
     return
   }
 
+  const style = document.createElement('style')
+  style.textContent = '[data-shopify="payment-button"] { display: none !important; }'
+  document.head.appendChild(style)
+
   const BUY_BUTTON_SELECTORS = [
     'form[action^="/cart/add"] [type="submit"]',
-    '[data-shopify="payment-button"]',
     'button[name="checkout"]',
     'a[href^="/checkout"]',
   ]
